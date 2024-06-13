@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from flarejax import __version__
+from flarenet import __version__
 
 
 with open("README.md", "r") as fh:
@@ -12,9 +12,8 @@ with open("requirements.txt") as f:
 
 description = "Common neural network modules and utilities based on flarejax."
 
-
 setup(
-    name="flarejax",
+    name="flarenet",
     version=__version__,
     packages=find_packages(where="."),
     python_requires=">=3.10",

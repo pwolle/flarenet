@@ -25,7 +25,7 @@ from ._activation import (
 from ._combine import Add, Concat, Identity, Index, Multiply, Residual
 from ._linear import Bias, Linear, Scale
 
-__version__ = "0.1.0"
+__version__ = "0.3.5"
 
 __all__ = [
     "ELU",
