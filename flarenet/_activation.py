@@ -48,6 +48,15 @@ class ELU(fj.Module):
         return jnn.elu(x)
 
 
+class GELU(fj.Module):
+    __module_name = "flarenet.GELU"
+
+    @fj.typecheck
+    @jax.named_scope("flarenet.GELU")
+    def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
+        return jnn.gelu(x)
+
+
 class GLU(fj.Module):
     __module_name = "flarenet.GLU"
 
@@ -57,15 +66,6 @@ class GLU(fj.Module):
     @jax.named_scope("flarenet.GLU")
     def __call__(self, x: Float[Array, "..."]) -> Float[Array, "..."]:
         return jnn.glu(x, self.axis)
-
-
-class GELU(fj.Module):
-    __module_name = "flarenet.GELU"
-
-    @fj.typecheck
-    @jax.named_scope("flarenet.GELU")
-    def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
-        return jnn.gelu(x)
 
 
 class HardSigmoid(fj.Module):

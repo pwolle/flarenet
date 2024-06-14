@@ -1,5 +1,6 @@
 from ._activation import (
     ELU,
+    GELU,
     GLU,
     CeLU,
     HardSigmoid,
@@ -25,10 +26,11 @@ from ._activation import (
 from ._combine import Add, Concat, Identity, Index, Multiply, Residual
 from ._linear import Bias, Linear, Scale
 
-__version__ = "0.3.6"
+__version__ = "0.3.7"
 
 __all__ = [
     "ELU",
+    "GELU",
     "GLU",
     "CeLU",
     "HardSigmoid",
