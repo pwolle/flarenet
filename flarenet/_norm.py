@@ -23,7 +23,6 @@ class LayerNorm(fj.Module):
         )
 
     @jaxtyped(typechecker=fj.typecheck)
-    @jax.named_scope("flarenet.LayerNorm")
     def __call__(
         self,
         x: Float[Array, "*b {self.dim}"],

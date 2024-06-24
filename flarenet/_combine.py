@@ -4,6 +4,8 @@ import flarejax as fj
 import jax
 import jax.numpy as jnp
 
+import oryx.core.interpreters.harvest as harvest
+
 T = TypeVar("T")
 
 
@@ -17,44 +19,70 @@ __all__ = [
 ]
 
 
-class Add(fj.Sequential):
+class Sequential(fj.ModuleSequence):
+    __module_name = "flarenet.Sequential"
+
+    @fj.typecheck
+    def __call__(self, x) -> Any:
+        for i, layer in enumerate(self):
+            assert callable(layer), f"Layer {layer} is not callable."
+
+            layer = harvest.nest(layer, scope=str(i))
+            x = layer(x)
+
+        return x
+
+
+class Add(Sequential):
+    __module_name = "flarenet.Add"
+
     @fj.typecheck
     def __call__(self, x) -> Any:
         y = 0
 
-        for module in self:
-            assert callable(module), f"Module {module} is not callable."
-            y = y + module(x)
+        for i, layer in enumerate(self):
+            assert callable(layer), f"Layer {layer} is not callable."
+
+            layer = harvest.nest(layer, scope=str(i))
+            y = y + layer(x)
 
         return y
 
 
-class Multiply(fj.Sequential):
+class Multiply(Sequential):
+    __module_name = "flarenet.Multiply"
+
     @fj.typecheck
     def __call__(self, x) -> Any:
         y = 1
 
-        for module in self:
-            assert callable(module), f"Module {module} is not callable."
-            y = y * module(x)
+        for i, layer in enumerate(self):
+            assert callable(layer), f"Layer {layer} is not callable."
+
+            layer = harvest.nest(layer, scope=str(i))
+            y = y * layer(x)
 
         return y
 
 
-class Concat(fj.Sequential):
+class Concat(Sequential):
+    __module_name = "flarenet.Concat"
 
     @fj.typecheck
     def __call__(self, x) -> jax.Array:
         y = []
 
-        for module in self:
-            assert callable(module), f"Module {module} is not callable."
-            y.append(module(x))
+        for i, layer in enumerate(self):
+            assert callable(layer), f"Layer {layer} is not callable."
+
+            layer = harvest.nest(layer, scope=str(i))
+            y.append(layer(x))
 
         return jnp.concatenate(y, axis=-1)
 
 
 class Identity(fj.Module):
+    __module_name = "flarenet.Identity"
 
     @fj.typecheck
     def __call__(self, x: T) -> T:
@@ -62,15 +90,19 @@ class Identity(fj.Module):
 
 
 class Residual(fj.Module):
-    module: fj.Module
+    __module_name = "flarenet.Residual"
+
+    layer: fj.Module
 
     @fj.typecheck
     def __call__(self, x) -> Any:
-        assert callable(self.module), f"Module {self.module} is not callable."
-        return x + self.module(x)
+        assert callable(self.layer), f"Layer {self.layer} is not callable."
+        return x + self.layer(x)
 
 
 class Index(fj.Module):
+    __module_name = "flarenet.Index"
+
     index: int | slice | tuple[int | slice, ...]
 
     @fj.typecheck

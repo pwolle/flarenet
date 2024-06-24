@@ -1,10 +1,11 @@
 import math
 
 import flarejax as fj
-import jax
 import jax.numpy as jnp
 import jax.random as jrandom
 from jaxtyping import Array, Float, PRNGKeyArray, jaxtyped
+
+from ._utils import tag_mode_sow
 
 __all__ = [
     "Linear",
@@ -80,15 +81,17 @@ class Linear(fj.Module):
         return cls(w=w, b=b)
 
     @jaxtyped(typechecker=fj.typecheck)
-    @jax.named_scope("flarenet.Linear")
     def __call__(
         self,
         x: Float[Array, "*b dim_in"],
     ) -> Float[Array, "*b {self.dim}"]:
         y = jnp.dot(x, self.w)
 
+        y = tag_mode_sow(y, name="x @ w")
+
         if self.has_bias:
             y += self.b
+            y = tag_mode_sow(y, name="x @ w + b")
 
         return y
 
@@ -119,12 +122,13 @@ class Bias(fj.Module):
         return cls(b=jnp.zeros((dim,)))
 
     @jaxtyped(typechecker=fj.typecheck)
-    @jax.named_scope("flarenet.Bias")
     def __call__(
         self,
         x: Float[Array, "*b {self.dim}"],
     ) -> Float[Array, "*b {self.dim}"]:
-        return x + self.b
+        y = x + self.b
+        y = tag_mode_sow(y, name="x + b")
+        return y
 
     @fj.typecheck
     @property
@@ -141,12 +145,43 @@ class Scale(fj.Module):
     def init(cls, dim: int):
         return cls(s=jnp.ones((dim,)))
 
-    @jax.named_scope("flarenet.Scale")
     def __call__(
         self, x: Float[Array, "*b {self.dim}"]
     ) -> Float[Array, "*b {self.dim}"]:
-        return x * self.s
+        y = x * self.s
+        y = tag_mode_sow(y, name="x * s")
+        return y
 
     @property
     def dim(self) -> int:
         return self.s.shape[0]
+
+
+class Constant(fj.Module):
+    x: Array
+
+    @classmethod
+    def random_normal(
+        cls,
+        key: PRNGKeyArray,
+        shape: tuple[int, ...],
+        std: float = 1.0,
+    ):
+        return cls(x=jrandom.normal(key, shape) * std)
+
+    @classmethod
+    def random_uniform(
+        cls,
+        key: PRNGKeyArray,
+        shape: tuple[int, ...],
+        low: float = -1.0,
+        high: float = 1.0,
+    ):
+        return cls(x=jrandom.uniform(key, shape, minval=low, maxval=high))
+
+    @classmethod
+    def constant(cls, x: float, shape: tuple[int, ...] = ()):
+        return cls(x=jnp.full(shape, x))
+
+    def __call__(self, *args, **kwargs) -> Array:
+        return self.x

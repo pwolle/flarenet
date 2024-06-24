@@ -23,7 +23,15 @@ from ._activation import (
     SquarePlus,
     Standardize,
 )
-from ._combine import Add, Concat, Identity, Index, Multiply, Residual
+from ._combine import (
+    Add,
+    Concat,
+    Identity,
+    Index,
+    Multiply,
+    Residual,
+    Sequential,
+)
 from ._linear import Bias, Linear, Scale
 
 __version__ = "0.3.7"
@@ -53,11 +61,12 @@ __all__ = [
     "SquarePlus",
     "Standardize",
     "Add",
-    "Multiply",
     "Concat",
     "Identity",
-    "Residual",
     "Index",
+    "Multiply",
+    "Residual",
+    "Sequential",
     "Bias",
     "Linear",
     "Scale",
