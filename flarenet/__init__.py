@@ -34,7 +34,7 @@ from ._combine import (
 )
 from ._linear import Bias, Constant, Linear, Scale
 
-__version__ = "0.3.8"
+__version__ = "0.3.9"
 
 __all__ = [
     "ELU",

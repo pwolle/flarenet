@@ -86,7 +86,7 @@ class Linear(fj.Module):
     @jaxtyped(typechecker=fj.typecheck)
     def __call__(
         self,
-        x: Float[Array, "*b dim_in"],
+        x: Float[Array, "*b {self.dim_in}"],
     ) -> Float[Array, "*b {self.dim}"]:
         y = jnp.dot(x, self.w)
 
