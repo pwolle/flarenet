@@ -32,9 +32,9 @@ from ._combine import (
     Residual,
     Sequential,
 )
-from ._linear import Bias, Linear, Scale
+from ._linear import Bias, Constant, Linear, Scale
 
-__version__ = "0.3.7"
+__version__ = "0.3.8"
 
 __all__ = [
     "ELU",
@@ -68,6 +68,7 @@ __all__ = [
     "Residual",
     "Sequential",
     "Bias",
+    "Constant",
     "Linear",
     "Scale",
     "__version__",

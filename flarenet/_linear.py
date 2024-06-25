@@ -9,6 +9,9 @@ from ._utils import tag_mode_sow
 
 __all__ = [
     "Linear",
+    "Bias",
+    "Scale",
+    "Constant",
 ]
 
 
@@ -32,8 +35,8 @@ class Linear(fj.Module):
 
     __module_name = "flarenet.Linear"
 
-    w: Array
-    b: Array | None
+    w: Float[Array, "dim_in dim"]
+    b: Float[Array, "dim"] | None
 
     @fj.typecheck
     @classmethod
@@ -114,7 +117,7 @@ class Linear(fj.Module):
 class Bias(fj.Module):
     __module_name = "flarenet.Bias"
 
-    b: Array
+    b: Float[Array, "..."]
 
     @fj.typecheck
     @classmethod
@@ -139,12 +142,13 @@ class Bias(fj.Module):
 class Scale(fj.Module):
     __module_name = "flarenet.Scale"
 
-    s: Array
+    s: Float[Array, "..."]
 
     @classmethod
     def init(cls, dim: int):
         return cls(s=jnp.ones((dim,)))
 
+    @jaxtyped(typechecker=fj.typecheck)
     def __call__(
         self, x: Float[Array, "*b {self.dim}"]
     ) -> Float[Array, "*b {self.dim}"]:
@@ -158,7 +162,9 @@ class Scale(fj.Module):
 
 
 class Constant(fj.Module):
-    x: Array
+    __module_name = "flarenet.Constant"
+
+    x: Float[Array, "..."]
 
     @classmethod
     def random_normal(
@@ -180,8 +186,17 @@ class Constant(fj.Module):
         return cls(x=jrandom.uniform(key, shape, minval=low, maxval=high))
 
     @classmethod
-    def constant(cls, x: float, shape: tuple[int, ...] = ()):
+    def full(cls, x: float = 0.0, shape: tuple[int, ...] = ()):
         return cls(x=jnp.full(shape, x))
 
+    @property
+    def shape(self) -> tuple[int, ...]:
+        return self.x.shape
+
+    @property
+    def dtype(self) -> jnp.dtype:
+        return self.x.dtype
+
+    @fj.typecheck
     def __call__(self, *args, **kwargs) -> Array:
         return self.x
