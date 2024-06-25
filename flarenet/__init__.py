@@ -33,8 +33,9 @@ from ._combine import (
     Sequential,
 )
 from ._linear import Bias, Constant, Linear, Scale
+from ._norm import LayerNorm
 
-__version__ = "0.3.9"
+__version__ = "0.3.11"
 
 __all__ = [
     "ELU",
@@ -71,5 +72,6 @@ __all__ = [
     "Constant",
     "Linear",
     "Scale",
+    "LayerNorm",
     "__version__",
 ]
