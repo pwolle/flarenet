@@ -1,5 +1,4 @@
 import flarejax as fj
-import jax
 from jaxtyping import Array, Float
 
 import jax.nn as jnn
@@ -7,7 +6,6 @@ import jax.nn as jnn
 __all__ = [
     "ELU",
     "GLU",
-    "CeLU",
     "HardSigmoid",
     "HardSiLU",
     "HardTanh",
@@ -30,14 +28,6 @@ __all__ = [
 ]
 
 
-class CeLU(fj.Module):
-    __module_name = "flarenet.CeLU"
-
-    @fj.typecheck
-    def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
-        return jnn.relu(x)
-
-
 class ELU(fj.Module):
     __module_name = "flarenet.ELU"
 
@@ -57,7 +47,7 @@ class GELU(fj.Module):
 class GLU(fj.Module):
     __module_name = "flarenet.GLU"
 
-    axis: int = -1
+    axis: int = fj.field(default=-1, static=True)
 
     @fj.typecheck
     def __call__(self, x: Float[Array, "..."]) -> Float[Array, "..."]:
@@ -91,7 +81,7 @@ class HardTanh(fj.Module):
 class LeakyReLU(fj.Module):
     __module_name = "flarenet.LeakyReLU"
 
-    negative_slope: float = 1e-2
+    negative_slope: float = fj.field(default=0.01, static=True)
 
     @fj.typecheck
     def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
@@ -125,7 +115,7 @@ class LogSumExp(fj.Module):
 class Standardize(fj.Module):
     __module_name = "flarenet.Standardize"
 
-    axis: int = -1
+    axis: int = fj.field(default=-1, static=True)
 
     @fj.typecheck
     def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
@@ -135,8 +125,8 @@ class Standardize(fj.Module):
 class OneHot(fj.Module):
     __module_name = "flarenet.OneHot"
 
-    num_classes: int
-    axis: int = -1
+    num_classes: int = fj.field(static=True)
+    axis: int = fj.field(default=-1, static=True)
 
     @fj.typecheck
     def __call__(
@@ -189,7 +179,7 @@ class SoftSign(fj.Module):
 class Softmax(fj.Module):
     __module_name = "flarenet.Softmax"
 
-    axis: int = -1
+    axis: int = fj.field(default=-1, static=True)
 
     @fj.typecheck
     def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
@@ -226,3 +216,12 @@ class SquarePlus(fj.Module):
     @fj.typecheck
     def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
         return jnn.squareplus(x)
+
+
+class SquareReLU(fj.Module):
+    __module_name = "flarenet.SquareReLU"
+
+    @fj.typecheck
+    def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
+        x = jnn.relu(x)
+        return x * x
