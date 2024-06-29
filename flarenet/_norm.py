@@ -21,7 +21,7 @@ class LayerNorm(fj.Module):
 
     @fj.typecheck
     @classmethod
-    def init(cls, dim: int, epsilon: float, axis: int = -1):
+    def init(cls, dim: int, epsilon: float = 1e-4, axis: int = -1):
         return cls(
             b=Bias.init(dim),
             s=Scale.init(dim),

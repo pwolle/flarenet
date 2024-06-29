@@ -46,7 +46,7 @@ class Linear(fj.Module):
         key: PRNGKeyArray,
         dim_in: int,
         dim: int,
-        use_bias: bool = True,
+        use_bias: bool = False,
     ):
         """
         Initialize the layer with random weights and biases. The default
