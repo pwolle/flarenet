@@ -1,5 +1,5 @@
 import flarejax as fj
-from jaxtyping import Array, Float
+from jaxtyping import Array, Float, jaxtyped
 
 import jax.nn as jnn
 
@@ -225,3 +225,16 @@ class SquareReLU(fj.Module):
     def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
         x = jnn.relu(x)
         return x * x
+
+
+class Softcap(fj.Module):
+    __module_name = "flarenet.Softcap"
+
+    cap: float = fj.field(static=True)
+
+    @jaxtyped(typechecker=fj.typecheck)
+    def __call__(self, x: Float[Array, "*s"]) -> Float[Array, "*s"]:
+        x = x / self.cap
+        x = jnn.tanh(x)
+        x = x * self.cap
+        return x

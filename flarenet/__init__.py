@@ -34,7 +34,7 @@ from ._combine import (
 from ._linear import Bias, Constant, Linear, LinearGeGLU, Scale
 from ._norm import LayerNorm, RMSNorm
 
-__version__ = "0.3.13"
+__version__ = "0.3.15"
 
 __all__ = [
     "ELU",

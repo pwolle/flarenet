@@ -46,7 +46,7 @@ class Linear(fj.Module):
         key: PRNGKeyArray,
         dim_in: int,
         dim: int,
-        use_bias: bool = False,
+        use_bias: bool = True,
     ):
         """
         Initialize the layer with random weights and biases. The default
@@ -115,21 +115,27 @@ class Linear(fj.Module):
         return self.b is not None
 
 
-class LinearGeGLU(Linear):
+class LinearGeGLU(fj.Module):
     __module_name = "auto-geo.GeGLU"
+
+    w: Linear
 
     @classmethod
     def init(cls, key, dim_in: int, dim: int, use_bias: bool = False):
-        return super().init(key, dim_in, 2 * dim, use_bias)
+        return cls(w=Linear.init(key, dim_in, 2 * dim, use_bias=use_bias))
 
     def __call__(self, x):
-        x = super().__call__(x)
+        x = self.w(x)
         x, g = jnp.split(x, 2, axis=-1)
         return x * jnn.gelu(g, approximate=True)
 
     @property
+    def dim_in(self):
+        return self.w.dim_in
+
+    @property
     def dim(self):
-        return super().dim // 2
+        return self.w.dim // 2
 
 
 class Bias(fj.Module):
