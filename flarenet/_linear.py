@@ -6,6 +6,7 @@ import jax.random as jrandom
 from jaxtyping import Array, Float, PRNGKeyArray, jaxtyped
 
 from ._utils import tag_mode_sow
+import jax.nn as jnn
 
 __all__ = [
     "Linear",
@@ -92,7 +93,7 @@ class Linear(fj.Module):
 
         y = tag_mode_sow(y, name="x @ w")
 
-        if self.has_bias:
+        if self.use_bias:
             y += self.b
             y = tag_mode_sow(y, name="x @ w + b")
 
@@ -110,8 +111,25 @@ class Linear(fj.Module):
 
     @fj.typecheck
     @property
-    def has_bias(self) -> bool:
+    def use_bias(self) -> bool:
         return self.b is not None
+
+
+class LinearGeGLU(Linear):
+    __module_name = "auto-geo.GeGLU"
+
+    @classmethod
+    def init(cls, key, dim_in: int, dim: int, use_bias: bool = False):
+        return super().init(key, dim_in, 2 * dim, use_bias)
+
+    def __call__(self, x):
+        x = super().__call__(x)
+        x, g = jnp.split(x, 2, axis=-1)
+        return x * jnn.gelu(g, approximate=True)
+
+    @property
+    def dim(self):
+        return super().dim // 2
 
 
 class Bias(fj.Module):
@@ -146,13 +164,13 @@ class Scale(fj.Module):
 
     @classmethod
     def init(cls, dim: int):
-        return cls(s=jnp.ones((dim,)))
+        return cls(s=jnp.zeros((dim,)))
 
     @jaxtyped(typechecker=fj.typecheck)
     def __call__(
         self, x: Float[Array, "*b {self.dim}"]
     ) -> Float[Array, "*b {self.dim}"]:
-        y = x * self.s
+        y = x * (1 + self.s)
         y = tag_mode_sow(y, name="x * s")
         return y
 

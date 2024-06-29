@@ -31,10 +31,10 @@ from ._combine import (
     Residual,
     Sequential,
 )
-from ._linear import Bias, Constant, Linear, Scale
-from ._norm import LayerNorm
+from ._linear import Bias, Constant, Linear, LinearGeGLU, Scale
+from ._norm import LayerNorm, RMSNorm
 
-__version__ = "0.3.11"
+__version__ = "0.3.13"
 
 __all__ = [
     "ELU",
@@ -69,7 +69,9 @@ __all__ = [
     "Bias",
     "Constant",
     "Linear",
+    "LinearGeGLU",
     "Scale",
     "LayerNorm",
+    "RMSNorm",
     "__version__",
 ]
