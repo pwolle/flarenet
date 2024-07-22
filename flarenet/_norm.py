@@ -18,15 +18,23 @@ class LayerNorm(fj.Module):
 
     epsilon: float = fj.field(static=True)
     axis: int = fj.field(static=True)
+    offset: bool = fj.field(static=True)
 
     @fj.typecheck
     @classmethod
-    def init(cls, dim: int, epsilon: float = 1e-4, axis: int = -1):
+    def init(
+        cls,
+        dim: int,
+        epsilon: float = 1e-4,
+        axis: int = -1,
+        offset: bool = False,
+    ):
         return cls(
             b=Bias.init(dim),
             s=Scale.init(dim),
             epsilon=epsilon,
             axis=axis,
+            offset=offset,
         )
 
     @jaxtyped(typechecker=fj.typecheck)

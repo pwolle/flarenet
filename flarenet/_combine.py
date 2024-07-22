@@ -26,7 +26,7 @@ class Sequential(fj.ModuleSequence):
         for i, layer in enumerate(self):
             assert callable(layer), f"Layer {layer} is not callable."
 
-            # layer = harvest.nest(layer, scope=str(i))
+            layer = harvest.nest(layer, scope=str(i))
             x = layer(x, *args, **kwargs)
 
         return x

@@ -46,7 +46,7 @@ class Linear(fj.Module):
         key: PRNGKeyArray,
         dim_in: int,
         dim: int,
-        use_bias: bool = True,
+        use_bias: bool = False,
     ):
         """
         Initialize the layer with random weights and biases. The default
@@ -167,16 +167,18 @@ class Scale(fj.Module):
     __module_name = "flarenet.Scale"
 
     s: Float[Array, "..."]
+    offset: bool = fj.field(default=True, static=True)
 
     @classmethod
-    def init(cls, dim: int):
-        return cls(s=jnp.zeros((dim,)))
+    def init(cls, dim: int, offset: bool = True):
+        return cls(s=jnp.zeros((dim,)), offset=True)
 
     @jaxtyped(typechecker=fj.typecheck)
     def __call__(
         self, x: Float[Array, "*b {self.dim}"]
     ) -> Float[Array, "*b {self.dim}"]:
-        y = x * (1 + self.s)
+        s = 1 + self.s if self.offset else self.s
+        y = x * s
         y = tag_mode_sow(y, name="x * s")
         return y
 
